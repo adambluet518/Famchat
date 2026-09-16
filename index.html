@@ -36,6 +36,7 @@
   #auth-submit:disabled { opacity:.6; cursor:not-allowed; }
   #auth-toggle { text-align:center; font-size:13px; color:#b9bbbe; }
   #auth-toggle a { color:#00aff4; cursor:pointer; text-decoration:none; }
+  #auth-toggle a:hover { text-decoration:underline; }
   #auth-error {
     background:#ed424522; border:1px solid #ed4245; color:#ed4245;
     padding:8px 12px; border-radius:4px; font-size:13px; margin-bottom:14px; display:none;
@@ -46,7 +47,7 @@
   #app { display:none; height:100vh; }
   #app.ready { display:flex; }
 
-  /* SERVER RAIL (far left) */
+  /* SERVER RAIL */
   #server-rail {
     width:72px; background:#202225; display:flex; flex-direction:column;
     align-items:center; padding:12px 0; gap:8px; overflow-y:auto;
@@ -55,7 +56,7 @@
     width:48px; height:48px; border-radius:50%; background:#36393f;
     display:flex; align-items:center; justify-content:center;
     color:#fff; font-weight:700; font-size:16px; cursor:pointer;
-    transition:border-radius .15s, background .15s; position:relative;
+    transition:border-radius .15s, background .15s;
     flex-shrink:0;
   }
   .server-icon:hover { border-radius:16px; background:#5865f2; }
@@ -71,7 +72,7 @@
   #server-header {
     padding:0 16px; height:48px; display:flex; align-items:center;
     justify-content:space-between; font-weight:700; color:#fff; font-size:15px;
-    background:#2f3136; border-bottom:1px solid #202225; box-shadow:0 1px 0 rgba(0,0,0,.2);
+    background:#2f3136; border-bottom:1px solid #202225;
   }
   #server-header .close-btn { color:#b9bbbe; cursor:pointer; font-size:14px; }
   #server-header .close-btn:hover { color:#ed4245; }
@@ -80,12 +81,10 @@
     text-transform:uppercase; color:#8e9297; letter-spacing:.02em;
     display:flex; justify-content:space-between; align-items:center;
   }
-  .section-label .add-mini {
-    color:#b9bbbe; cursor:pointer; font-size:14px;
-  }
+  .section-label .add-mini { color:#b9bbbe; cursor:pointer; font-size:14px; }
   .section-label .add-mini:hover { color:#fff; }
-  #channel-list, #dm-list { flex-shrink:0; padding:0 8px 8px; overflow-y:auto; }
-  #channel-list { max-height:40vh; }
+  #channel-list, #dm-list { flex-shrink:0; padding:0 8px 8px; }
+  #channel-list { max-height:40vh; overflow-y:auto; }
   #dm-list { flex:1; overflow-y:auto; }
   .channel {
     padding:7px 10px; border-radius:4px; cursor:pointer; font-size:14px;
@@ -101,11 +100,8 @@
   }
   .channel:hover .del { opacity:1; }
   .channel .del:hover { background:#ed424533; }
-  .channel .unread-dot {
-    width:8px; height:8px; border-radius:50%; background:#ed4245; flex-shrink:0;
-  }
 
-  /* USER BAR (bottom of sidebar) */
+  /* USER BAR */
   #user-bar {
     margin-top:auto; background:#292b2f; padding:8px 10px;
     display:flex; align-items:center; gap:8px;
@@ -135,7 +131,7 @@
   #channel-title {
     padding:0 16px; height:48px; display:flex; align-items:center; gap:8px;
     font-weight:700; color:#fff; font-size:15px;
-    border-bottom:1px solid #202225; box-shadow:0 1px 0 rgba(0,0,0,.2);
+    border-bottom:1px solid #202225;
   }
   #channel-title::before { content:'#'; color:#72767d; font-size:22px; font-weight:500; }
   #channel-title.dm::before { content:'@'; }
@@ -181,11 +177,9 @@
 
   .typing-indicator {
     padding:0 16px 4px; font-size:12px; color:#b9bbbe;
-    height:18px; transition:opacity .2s;
+    height:18px;
   }
-  .typing-indicator .dots::after {
-    content:''; animation:dots 1.4s infinite;
-  }
+  .typing-indicator .dots::after { content:''; animation:dots 1.4s infinite; }
   @keyframes dots {
     0%   { content:''; }
     25%  { content:'.'; }
@@ -193,7 +187,7 @@
     75%  { content:'...'; }
   }
 
-  /* INPUT AREA */
+  /* INPUT */
   #input-area { padding:0 16px 16px; }
   #attach-preview {
     display:none; padding:8px 12px; background:#2f3136; border-radius:6px 6px 0 0;
@@ -202,9 +196,7 @@
   }
   #attach-preview.show { display:flex; }
   #attach-preview img { max-height:60px; border-radius:4px; }
-  #attach-preview .remove {
-    margin-left:auto; color:#ed4245; cursor:pointer; font-size:14px;
-  }
+  #attach-preview .remove { margin-left:auto; color:#ed4245; cursor:pointer; font-size:14px; }
   #input-wrapper {
     background:#40444b; border-radius:8px; display:flex; align-items:center;
     padding:0 12px; gap:6px;
@@ -212,17 +204,12 @@
   #message-input {
     flex:1; background:transparent; border:none; outline:none; color:#dcddde;
     padding:12px 6px; font-size:14px; resize:none; max-height:120px;
-    font-family:inherit;
   }
-  #attach-btn {
+  #attach-btn, #send-btn {
     background:transparent; border:none; color:#b9bbbe; font-size:18px;
     cursor:pointer; padding:8px; border-radius:4px;
   }
   #attach-btn:hover { color:#fff; }
-  #send-btn {
-    background:transparent; border:none; color:#b9bbbe; font-size:18px;
-    cursor:pointer; padding:8px; border-radius:4px;
-  }
   #send-btn:hover { color:#5865f2; }
   #send-btn:disabled { opacity:.4; cursor:not-allowed; }
 
@@ -238,16 +225,13 @@
   }
   .modal h2 { color:#fff; font-size:18px; margin-bottom:16px; }
   .modal p { color:#b9bbbe; font-size:13px; margin-bottom:16px; }
-  .modal input, .modal select {
+  .modal input {
     width:100%; padding:10px; background:#202225; border:1px solid #202225;
     border-radius:4px; color:#dcddde; font-size:14px; margin-bottom:14px; outline:none;
   }
-  .modal input:focus, .modal select:focus { border-color:#5865f2; }
+  .modal input:focus { border-color:#5865f2; }
   .modal-actions { display:flex; gap:8px; justify-content:flex-end; }
-  .modal-actions button {
-    padding:9px 16px; border:none; border-radius:4px; font-size:14px;
-    font-weight:600;
-  }
+  .modal-actions button { padding:9px 16px; border:none; border-radius:4px; font-size:14px; font-weight:600; }
   .btn-primary { background:#5865f2; color:#fff; }
   .btn-primary:hover { background:#4752c4; }
   .btn-secondary { background:transparent; color:#dcddde; }
@@ -262,6 +246,8 @@
     align-items:center; justify-content:center; color:#fff; font-weight:700;
     font-size:12px;
   }
+  .user-pick-item .uname { color:#fff; font-weight:600; font-size:14px; }
+  .user-pick-item .uhandle { color:#b9bbbe; font-size:12px; }
 
   /* LIGHTBOX */
   #lightbox {
@@ -272,7 +258,7 @@
   #lightbox.show { display:flex; }
   #lightbox img { max-width:90vw; max-height:90vh; border-radius:6px; }
 
-  /* TOAST */
+  /* TOAST + LOADING + STATUS */
   #toast {
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px);
     background:#ed4245; color:#fff; padding:12px 20px; border-radius:6px;
@@ -281,7 +267,6 @@
   #toast.show { transform:translateX(-50%) translateY(0); }
   #toast.success { background:#3ba55d; }
 
-  /* LOADING + STATUS */
   #loading {
     position:fixed; inset:0; background:rgba(0,0,0,.6);
     display:none; align-items:center; justify-content:center;
@@ -299,12 +284,6 @@
   ::-webkit-scrollbar { width:8px; height:8px; }
   ::-webkit-scrollbar-thumb { background:#202225; border-radius:4px; }
   ::-webkit-scrollbar-track { background:transparent; }
-
-  @media (max-width:700px) {
-    #sidebar { width:200px; }
-    #server-rail { width:60px; }
-    .server-icon { width:42px; height:42px; }
-  }
 </style>
 </head>
 <body>
@@ -315,13 +294,11 @@
     <h1 id="auth-title">Welcome Back</h1>
     <p class="sub" id="auth-sub">Log in to continue to Mini Discord</p>
     <div id="auth-error"></div>
-    <label for="auth-email">Email</label>
-    <input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email">
-    <label for="auth-name" id="auth-name-label" style="display:none;">Display Name</label>
-    <input id="auth-name" type="text" placeholder="Alice" maxlength="24" style="display:none;">
+    <label for="auth-username">Username</label>
+    <input id="auth-username" type="text" placeholder="alice" autocomplete="username" maxlength="24">
     <label for="auth-password">Password</label>
     <input id="auth-password" type="password" placeholder="••••••••" autocomplete="current-password">
-    <button id="auth-submit">Log In</button>
+    <button id="auth-submit" type="button">Log In</button>
     <div id="auth-toggle">
       <span id="auth-toggle-text">Need an account?</span>
       <a id="auth-toggle-link">Register</a>
@@ -385,7 +362,7 @@
   <div class="modal">
     <h2>Create Channel</h2>
     <p>Channels are where your members communicate.</p>
-    <input id="channel-name-input" placeholder="new-channel" maxlength="24" autofocus>
+    <input id="channel-name-input" placeholder="new-channel" maxlength="24">
     <div class="modal-actions">
       <button class="btn-secondary" id="channel-cancel">Cancel</button>
       <button class="btn-primary" id="channel-create">Create</button>
@@ -397,7 +374,7 @@
   <div class="modal">
     <h2>New Direct Message</h2>
     <p>Pick a user to start a private conversation.</p>
-    <input id="dm-search" placeholder="Search users by email or name…">
+    <input id="dm-search" placeholder="Search users…">
     <div id="dm-user-list" style="max-height:300px; overflow-y:auto;"></div>
     <div class="modal-actions" style="margin-top:12px;">
       <button class="btn-secondary" id="dm-cancel">Cancel</button>
@@ -417,11 +394,11 @@
 const CONFIG = {
   MAIN_BIN: '6aaaefcdffd5d160530f6e45',
   USERS_BIN: '6aaaf192ac6210605ad5e308',
-  API_KEY: '$2a$10$uyUmMlWjsXk3ZqRnP/mYI.yyggpk7wmFK7ECpg3LDPRy4v8wTk52i',
+  API_KEY: '$2a$10$Wt9uWCbOUzdn7kj5BqbXfO/nNtmZNWyk9N/zDECtyLRmY/j1Uqk7K',
   BASE_URL: 'https://api.jsonbin.io/v3/b/',
   POLL_MS: 10000,
   SESSION_HOURS: 24,
-  MAX_ATTACH_BYTES: 80 * 1024 // 80 KB
+  MAX_ATTACH_BYTES: 80 * 1024
 };
 
 /* ============================================================
@@ -432,49 +409,45 @@ const state = {
   mainData: null,
   currentUser: null,
   currentServerId: null,
-  currentChatId: null,   // channel id or dm id
+  currentChatId: null,
   currentChatType: null, // 'channel' | 'dm'
   isSending: false,
   pendingAttachment: null,
   lastHash: '',
-  typingDebounce: null,
-  myTypingPinged: false
+  typingDebounce: null
 };
 
 /* ============================================================
-   DOM HELPERS
+   DOM
    ============================================================ */
 const $ = id => document.getElementById(id);
 const els = {
-  authScreen: $('auth-screen'), authTitle: $('auth-title'), authSub: $('auth-sub'),
-  authError: $('auth-error'), authEmail: $('auth-email'), authName: $('auth-name'),
-  authNameLabel: $('auth-name-label'), authPassword: $('auth-password'),
-  authSubmit: $('auth-submit'), authToggleText: $('auth-toggle-text'),
-  authToggleLink: $('auth-toggle-link'),
-  app: $('app'),
-  serverRail: $('server-rail'), sidebar: $('sidebar'),
-  serverName: $('server-name'), deleteServer: $('delete-server'),
-  channelList: $('channel-list'), dmList: $('dm-list'),
-  addChannelBtn: $('add-channel-btn'), addDmBtn: $('add-dm-btn'),
-  userAvatar: $('user-avatar'), userInitials: $('user-initials'),
-  userName: $('user-name'), logoutBtn: $('logout-btn'),
-  channelTitle: $('channel-title'), messages: $('messages'),
-  typingIndicator: $('typing-indicator'),
-  input: $('message-input'), sendBtn: $('send-btn'),
-  attachBtn: $('attach-btn'), fileInput: $('file-input'),
-  attachPreview: $('attach-preview'), attachImg: $('attach-img'),
-  attachName: $('attach-name'), attachRemove: $('attach-remove'),
-  channelModal: $('channel-modal'), channelNameInput: $('channel-name-input'),
-  channelCancel: $('channel-cancel'), channelCreate: $('channel-create'),
-  dmModal: $('dm-modal'), dmSearch: $('dm-search'),
-  dmUserList: $('dm-user-list'), dmCancel: $('dm-cancel'),
-  lightbox: $('lightbox'), lightboxImg: $('lightbox-img'),
-  toast: $('toast'), loading: $('loading'),
-  status: $('status'), statusText: $('status-text')
+  authScreen:$('auth-screen'), authTitle:$('auth-title'), authSub:$('auth-sub'),
+  authError:$('auth-error'), authUsername:$('auth-username'), authPassword:$('auth-password'),
+  authSubmit:$('auth-submit'), authToggleText:$('auth-toggle-text'), authToggleLink:$('auth-toggle-link'),
+  app:$('app'), serverRail:$('server-rail'), sidebar:$('sidebar'),
+  serverName:$('server-name'), deleteServer:$('delete-server'),
+  channelList:$('channel-list'), dmList:$('dm-list'),
+  addChannelBtn:$('add-channel-btn'), addDmBtn:$('add-dm-btn'),
+  userAvatar:$('user-avatar'), userInitials:$('user-initials'),
+  userName:$('user-name'), logoutBtn:$('logout-btn'),
+  channelTitle:$('channel-title'), messages:$('messages'),
+  typingIndicator:$('typing-indicator'),
+  input:$('message-input'), sendBtn:$('send-btn'),
+  attachBtn:$('attach-btn'), fileInput:$('file-input'),
+  attachPreview:$('attach-preview'), attachImg:$('attach-img'),
+  attachName:$('attach-name'), attachRemove:$('attach-remove'),
+  channelModal:$('channel-modal'), channelNameInput:$('channel-name-input'),
+  channelCancel:$('channel-cancel'), channelCreate:$('channel-create'),
+  dmModal:$('dm-modal'), dmSearch:$('dm-search'),
+  dmUserList:$('dm-user-list'), dmCancel:$('dm-cancel'),
+  lightbox:$('lightbox'), lightboxImg:$('lightbox-img'),
+  toast:$('toast'), loading:$('loading'),
+  status:$('status'), statusText:$('status-text')
 };
 
 /* ============================================================
-   UTILITIES
+   UTIL
    ============================================================ */
 function setStatus(online) {
   els.status.classList.toggle('online', online);
@@ -488,15 +461,6 @@ function escapeHtml(s) {
 }
 function timeStr(ts) {
   return new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-}
-function relTime(ts) {
-  const diff = Date.now() - ts;
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return m + 'm ago';
-  const h = Math.floor(m / 60);
-  if (h < 24) return h + 'h ago';
-  return new Date(ts).toLocaleDateString();
 }
 function avatarColor(name) {
   const colors = ['#5865f2','#3ba55d','#faa61a','#ed4245','#eb459e','#00b0f4','#9b59b6','#e67e22'];
@@ -517,7 +481,7 @@ function toast(msg, success = false) {
 }
 
 /* ============================================================
-   CRYPTO — PBKDF2 password hashing via WebCrypto
+   CRYPTO (PBKDF2)
    ============================================================ */
 async function hashPassword(password) {
   const enc = new TextEncoder();
@@ -554,12 +518,11 @@ async function verifyPassword(password, stored) {
 }
 
 /* ============================================================
-   JSONBIN API
+   API
    ============================================================ */
 async function apiGet(binId) {
   const res = await fetch(CONFIG.BASE_URL + binId + '/latest', {
-    headers: { 'X-Master-Key': CONFIG.API_KEY },
-    cache: 'no-store'
+    headers: { 'X-Master-Key': CONFIG.API_KEY }, cache:'no-store'
   });
   if (!res.ok) throw new Error('GET failed ' + res.status);
   const json = await res.json();
@@ -567,11 +530,8 @@ async function apiGet(binId) {
 }
 async function apiPut(binId, data) {
   const res = await fetch(CONFIG.BASE_URL + binId, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Master-Key': CONFIG.API_KEY
-    },
+    method:'PUT',
+    headers: { 'Content-Type':'application/json', 'X-Master-Key': CONFIG.API_KEY },
     body: JSON.stringify(data)
   });
   if (!res.ok) throw new Error('PUT failed ' + res.status);
@@ -579,9 +539,9 @@ async function apiPut(binId, data) {
 }
 
 /* ============================================================
-   AUTH FLOW
+   AUTH
    ============================================================ */
-let authMode = 'login'; // 'login' | 'register'
+let authMode = 'login';
 
 function setAuthMode(mode) {
   authMode = mode;
@@ -591,17 +551,13 @@ function setAuthMode(mode) {
     els.authSubmit.textContent = 'Log In';
     els.authToggleText.textContent = 'Need an account?';
     els.authToggleLink.textContent = 'Register';
-    els.authName.style.display = 'none';
-    els.authNameLabel.style.display = 'none';
     els.authPassword.autocomplete = 'current-password';
   } else {
     els.authTitle.textContent = 'Create an Account';
-    els.authSub.textContent = 'Sign up to start chatting';
+    els.authSub.textContent = 'Pick a username and password';
     els.authSubmit.textContent = 'Register';
     els.authToggleText.textContent = 'Already have an account?';
     els.authToggleLink.textContent = 'Log In';
-    els.authName.style.display = 'block';
-    els.authNameLabel.style.display = 'block';
     els.authPassword.autocomplete = 'new-password';
   }
   els.authError.classList.remove('show');
@@ -612,67 +568,80 @@ function showAuthError(msg) {
   els.authError.classList.add('show');
 }
 
-async function handleAuthSubmit() {
-  const email = els.authEmail.value.trim().toLowerCase();
-  const password = els.authPassword.value;
-  const name = els.authName.value.trim();
+function makeSession(userId) {
+  const now = Date.now();
+  return {
+    token: uid('sess'),
+    userId,
+    createdAt: now,
+    expiresAt: now + CONFIG.SESSION_HOURS * 3600 * 1000,
+    userAgent: navigator.userAgent.slice(0, 80)
+  };
+}
+function pruneSessions(sessions) {
+  const now = Date.now();
+  return sessions.filter(s => s.expiresAt > now);
+}
 
-  if (!email || !email.includes('@')) return showAuthError('Please enter a valid email.');
+async function handleAuthSubmit() {
+  const username = els.authUsername.value.trim();
+  const usernameLower = username.toLowerCase();
+  const password = els.authPassword.value;
+
+  if (!username || username.length < 2) return showAuthError('Username must be at least 2 characters.');
+  if (!/^[a-zA-Z0-9_.-]+$/.test(username)) return showAuthError('Username: letters, numbers, . _ - only.');
   if (password.length < 6) return showAuthError('Password must be at least 6 characters.');
-  if (authMode === 'register' && !name) return showAuthError('Please enter a display name.');
 
   els.authSubmit.disabled = true;
   els.authSubmit.textContent = authMode === 'login' ? 'Logging in…' : 'Creating account…';
   showLoading(true);
 
   try {
-    // fresh fetch of users
     const usersData = await apiGet(CONFIG.USERS_BIN);
+    if (!usersData.users) usersData.users = [];
+    if (!usersData.sessions) usersData.sessions = [];
     state.usersData = usersData;
 
     if (authMode === 'register') {
-      if (usersData.users.some(u => u.emailLower === email)) {
-        throw new Error('An account with this email already exists.');
+      if (usersData.users.some(u => u.usernameLower === usernameLower)) {
+        throw new Error('That username is already taken.');
       }
       const passwordHash = await hashPassword(password);
       const user = {
         id: uid('u'),
-        email,
-        emailLower: email,
-        displayName: name.slice(0, 24),
+        username: username.slice(0, 24),
+        usernameLower,
+        displayName: username.slice(0, 24),
         passwordHash,
-        avatarColor: avatarColor(email),
+        avatarColor: avatarColor(usernameLower),
         createdAt: Date.now(),
         lastLoginAt: Date.now(),
         status: 'online',
-        friends: [],
         dmChannels: []
       };
       usersData.users.push(user);
-      // create session
+      usersData.sessions = pruneSessions(usersData.sessions);
       const session = makeSession(user.id);
-      usersData.sessions = pruneSessions(usersData.sessions || []);
       usersData.sessions.push(session);
       await apiPut(CONFIG.USERS_BIN, usersData);
       state.currentUser = user;
       localStorage.setItem('md_session', session.token);
       toast('Account created! Welcome 🎉', true);
     } else {
-      const user = usersData.users.find(u => u.emailLower === email);
-      if (!user) throw new Error('No account found with that email.');
+      const user = usersData.users.find(u => u.usernameLower === usernameLower);
+      if (!user) throw new Error('No account with that username.');
       const ok = await verifyPassword(password, user.passwordHash);
       if (!ok) throw new Error('Incorrect password.');
       user.lastLoginAt = Date.now();
       user.status = 'online';
+      usersData.sessions = pruneSessions(usersData.sessions);
       const session = makeSession(user.id);
-      usersData.sessions = pruneSessions(usersData.sessions || []);
       usersData.sessions.push(session);
       await apiPut(CONFIG.USERS_BIN, usersData);
       state.currentUser = user;
       localStorage.setItem('md_session', session.token);
     }
 
-    // success — enter app
     els.authPassword.value = '';
     await enterApp();
   } catch (e) {
@@ -685,7 +654,738 @@ async function handleAuthSubmit() {
   }
 }
 
-function makeSession(userId) {
-  const now = Date.now();
+async function tryRestoreSession() {
+  const token = localStorage.getItem('md_session');
+  if (!token) return false;
+  try {
+    const usersData = await apiGet(CONFIG.USERS_BIN);
+    state.usersData = usersData;
+    const session = (usersData.sessions || []).find(s => s.token === token && s.expiresAt > Date.now());
+    if (!session) { localStorage.removeItem('md_session'); return false; }
+    const user = usersData.users.find(u => u.id === session.userId);
+    if (!user) { localStorage.removeItem('md_session'); return false; }
+    state.currentUser = user;
+    return true;
+  } catch (e) { console.error(e); return false; }
+}
+
+async function logout() {
+  try {
+    if (state.usersData && state.currentUser) {
+      state.usersData.sessions = (state.usersData.sessions || [])
+        .filter(s => s.userId !== state.currentUser.id);
+      const u = state.usersData.users.find(x => x.id === state.currentUser.id);
+      if (u) u.status = 'offline';
+      await apiPut(CONFIG.USERS_BIN, state.usersData);
+    }
+  } catch (e) { console.warn(e); }
+  localStorage.removeItem('md_session');
+  location.reload();
+}
+
+/* ============================================================
+   ENTER APP
+   ============================================================ */
+async function enterApp() {
+  els.authScreen.style.display = 'none';
+  els.app.classList.add('ready');
+
+  els.userInitials.textContent = initials(state.currentUser.displayName);
+  els.userAvatar.style.background = state.currentUser.avatarColor;
+  els.userName.textContent = state.currentUser.displayName;
+
+  await loadMainData();
+  if (!state.mainData.servers || state.mainData.servers.length === 0) {
+    // create default server for this user
+    state.mainData.servers = [makeDefaultServer()];
+    await saveMainData();
+  }
+  state.currentServerId = state.mainData.servers[0].id;
+  state.currentChatId = state.mainData.servers[0].channels[0].id;
+  state.currentChatType = 'channel';
+  renderAll();
+  setStatus(true);
+  startPolling();
+}
+
+function makeDefaultServer() {
   return {
-    token: uid
+    id: uid('srv'),
+    name: state.currentUser.displayName + "'s Server",
+    ownerId: state.currentUser.id,
+    memberIds: [state.currentUser.id],
+    channels: [{ id:'general', name:'general', type:'text', topic:'', messages:[] }],
+    createdAt: Date.now()
+  };
+}
+
+async function loadMainData() {
+  const data = await apiGet(CONFIG.MAIN_BIN);
+  if (!data.servers) data.servers = [];
+  if (!data.dms) data.dms = [];
+  if (!data.typing) data.typing = {};
+  state.mainData = data;
+}
+
+async function saveMainData() {
+  state.mainData.meta = {
+    version: 2, schema: 'mini-discord-v2', lastUpdated: Date.now()
+  };
+  await apiPut(CONFIG.MAIN_BIN, state.mainData);
+}
+
+/* ============================================================
+   HELPERS — access current server / chat
+   ============================================================ */
+function currentServer() {
+  return state.mainData.servers.find(s => s.id === state.currentServerId);
+}
+function currentChannel() {
+  const s = currentServer();
+  if (!s) return null;
+  return s.channels.find(c => c.id === state.currentChatId) || null;
+}
+function currentDm() {
+  return state.mainData.dms.find(d => d.id === state.currentChatId) || null;
+}
+function currentMessages() {
+  if (state.currentChatType === 'channel') {
+    const c = currentChannel();
+    return c ? c.messages : [];
+  } else {
+    const d = currentDm();
+    return d ? d.messages : [];
+  }
+}
+function dmPartnerId(dm) {
+  return dm.participantIds.find(id => id !== state.currentUser.id);
+}
+function getUserById(id) {
+  return state.usersData.users.find(u => u.id === id);
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderAll() {
+  renderServers();
+  renderChannels();
+  renderDms();
+  renderMessages();
+}
+
+function renderServers() {
+  els.serverRail.innerHTML = '';
+  state.mainData.servers.forEach(srv => {
+    const div = document.createElement('div');
+    div.className = 'server-icon' + (srv.id === state.currentServerId ? ' active' : '');
+    div.textContent = initials(srv.name);
+    div.title = srv.name;
+    div.addEventListener('click', () => {
+      state.currentServerId = srv.id;
+      state.currentChatId = srv.channels[0]?.id || null;
+      state.currentChatType = 'channel';
+      state.lastHash = '';
+      renderAll();
+    });
+    els.serverRail.appendChild(div);
+  });
+  const add = document.createElement('div');
+  add.className = 'server-icon add';
+  add.textContent = '+';
+  add.title = 'New server';
+  add.addEventListener('click', createServer);
+  els.serverRail.appendChild(add);
+}
+
+function renderChannels() {
+  const srv = currentServer();
+  if (!srv) return;
+  els.serverName.textContent = srv.name;
+  els.channelList.innerHTML = '';
+  srv.channels.forEach(ch => {
+    const div = document.createElement('div');
+    div.className = 'channel' +
+      (ch.id === state.currentChatId && state.currentChatType === 'channel' ? ' active' : '');
+    div.innerHTML = `<span class="name"># ${escapeHtml(ch.name)}</span>
+                     <span class="del" data-id="${ch.id}" title="Delete">✕</span>`;
+    div.addEventListener('click', e => {
+      if (e.target.classList.contains('del')) return;
+      state.currentChatId = ch.id;
+      state.currentChatType = 'channel';
+      state.lastHash = '';
+      renderAll();
+      els.input.focus();
+    });
+    div.querySelector('.del').addEventListener('click', e => {
+      e.stopPropagation(); deleteChannel(ch.id);
+    });
+    els.channelList.appendChild(div);
+  });
+}
+
+function renderDms() {
+  els.dmList.innerHTML = '';
+  const myDms = state.mainData.dms.filter(d =>
+    d.participantIds.includes(state.currentUser.id)
+  );
+  if (myDms.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'padding:8px 12px;color:#72767d;font-size:12px;';
+    empty.textContent = 'No DMs yet — click ＋ to start one';
+    els.dmList.appendChild(empty);
+    return;
+  }
+  myDms.forEach(dm => {
+    const partnerId = dmPartnerId(dm);
+    const partner = getUserById(partnerId) || { displayName:'Unknown', avatarColor:'#72767d' };
+    const div = document.createElement('div');
+    div.className = 'channel' +
+      (dm.id === state.currentChatId && state.currentChatType === 'dm' ? ' active' : '');
+    div.innerHTML = `<span class="name">@ ${escapeHtml(partner.displayName)}</span>`;
+    div.addEventListener('click', () => {
+      state.currentChatId = dm.id;
+      state.currentChatType = 'dm';
+      state.lastHash = '';
+      renderAll();
+      els.input.focus();
+    });
+    els.dmList.appendChild(div);
+  });
+}
+
+function renderMessages() {
+  if (!state.currentChatId) return;
+  const msgs = currentMessages();
+
+  // title
+  els.channelTitle.classList.toggle('dm', state.currentChatType === 'dm');
+  if (state.currentChatType === 'dm') {
+    const dm = currentDm();
+    const partner = getUserById(dmPartnerId(dm));
+    els.channelTitle.textContent = partner?.displayName || 'Unknown';
+    els.input.placeholder = `Message @${partner?.displayName || 'user'}`;
+  } else {
+    const ch = currentChannel();
+    els.channelTitle.textContent = ch?.name || 'channel';
+    els.input.placeholder = `Message #${ch?.name || 'channel'}`;
+  }
+
+  const wasAtBottom =
+    els.messages.scrollHeight - els.messages.scrollTop - els.messages.clientHeight < 80;
+
+  const hash = state.currentChatId + '::' + msgs.length + '::' +
+    (msgs[msgs.length - 1]?.id || '') + '::' +
+    msgs.map(m => (m.editedAt||0) + (m.deleted?'d':'')).join('');
+  if (hash === state.lastHash && els.messages.children.length > 0) {
+    if (wasAtBottom) els.messages.scrollTop = els.messages.scrollHeight;
+    return;
+  }
+  state.lastHash = hash;
+
+  els.messages.innerHTML = '';
+  if (msgs.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'color:#72767d;font-size:13px;text-align:center;margin-top:40px;';
+    empty.textContent = state.currentChatType === 'dm'
+      ? 'This is the start of your DM. Say hi!'
+      : `Welcome to #${currentChannel()?.name}. Say hi!`;
+    els.messages.appendChild(empty);
+  } else {
+    msgs.forEach(m => els.messages.appendChild(buildMessageEl(m)));
+  }
+
+  if (wasAtBottom || msgs.length <= 1) {
+    els.messages.scrollTop = els.messages.scrollHeight;
+  }
+}
+
+function buildMessageEl(m) {
+  const div = document.createElement('div');
+  div.className = 'msg' + (m.deleted ? ' deleted' : '');
+  const color = avatarColor(m.user || '');
+  const isMine = m.userId === state.currentUser.id;
+
+  let inner = `
+    <div class="avatar" style="background:${color}">${initials(m.user || '?')}</div>
+    <div class="msg-body">
+      <div class="msg-header">
+        <span class="msg-user">${escapeHtml(m.user || 'Unknown')}</span>
+        <span class="msg-time">${timeStr(m.timestamp)}</span>
+        ${m.editedAt ? '<span class="msg-edited">(edited)</span>' : ''}
+      </div>
+      <div class="msg-text">${
+        m.deleted ? '<em>This message was deleted</em>' : escapeHtml(m.text || '')
+      }</div>`;
+
+  if (!m.deleted && m.attachments && m.attachments.length) {
+    inner += '<div class="msg-attachments">';
+    m.attachments.forEach(att => {
+      if (att.type === 'image') {
+        inner += `<img src="${att.data}" alt="${escapeHtml(att.name)}" data-full="${att.data}">`;
+      }
+    });
+    inner += '</div>';
+  }
+
+  inner += '</div>';
+
+  if (isMine && !m.deleted) {
+    inner += `
+      <div class="msg-actions">
+        <button data-act="edit" data-id="${m.id}">Edit</button>
+        <button class="danger" data-act="delete" data-id="${m.id}">Delete</button>
+      </div>`;
+  }
+
+  div.innerHTML = inner;
+
+  div.querySelectorAll('.msg-attachments img').forEach(img => {
+    img.addEventListener('click', () => {
+      els.lightboxImg.src = img.dataset.full;
+      els.lightbox.classList.add('show');
+    });
+  });
+
+  div.querySelectorAll('.msg-actions button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.act === 'edit') editMessage(btn.dataset.id);
+      else if (btn.dataset.act === 'delete') deleteMessage(btn.dataset.id);
+    });
+  });
+
+  return div;
+}
+
+/* ============================================================
+   MESSAGE ACTIONS
+   ============================================================ */
+async function sendMessage() {
+  const text = els.input.value.trim();
+  const hasAttach = !!state.pendingAttachment;
+  if ((!text && !hasAttach) || state.isSending) return;
+
+  state.isSending = true;
+  els.sendBtn.disabled = true;
+  els.input.value = '';
+  els.input.style.height = 'auto';
+
+  try {
+    const msg = {
+      id: uid('msg'),
+      userId: state.currentUser.id,
+      user: state.currentUser.displayName,
+      text,
+      timestamp: Date.now(),
+      editedAt: null,
+      deleted: false,
+      deletedAt: null,
+      attachments: hasAttach ? [state.pendingAttachment] : [],
+      reactions: {}
+    };
+    currentMessages().push(msg);
+
+    // trim
+    const arr = currentMessages();
+    if (arr.length > 500) arr.splice(0, arr.length - 500);
+
+    // clear typing
+    clearTyping();
+
+    await saveMainData();
+    state.lastHash = '';
+    renderMessages();
+    setStatus(true);
+  } catch (e) {
+    console.error(e);
+    setStatus(false);
+    toast('Failed to send message');
+  } finally {
+    state.isSending = false;
+    els.sendBtn.disabled = false;
+    clearAttachment();
+    els.input.focus();
+  }
+}
+
+async function editMessage(msgId) {
+  const arr = currentMessages();
+  const m = arr.find(x => x.id === msgId);
+  if (!m || m.userId !== state.currentUser.id) return;
+  const newText = prompt('Edit message:', m.text);
+  if (newText === null) return;
+  const trimmed = newText.trim();
+  if (!trimmed || trimmed === m.text) return;
+  m.text = trimmed;
+  m.editedAt = Date.now();
+  try {
+    await saveMainData();
+    state.lastHash = '';
+    renderMessages();
+  } catch (e) { toast('Failed to edit message'); }
+}
+
+async function deleteMessage(msgId) {
+  const arr = currentMessages();
+  const m = arr.find(x => x.id === msgId);
+  if (!m || m.userId !== state.currentUser.id) return;
+  if (!confirm('Delete this message?')) return;
+  m.deleted = true;
+  m.deletedAt = Date.now();
+  m.text = '';
+  m.attachments = [];
+  try {
+    await saveMainData();
+    state.lastHash = '';
+    renderMessages();
+  } catch (e) { toast('Failed to delete message'); }
+}
+
+/* ============================================================
+   ATTACHMENTS
+   ============================================================ */
+function clearAttachment() {
+  state.pendingAttachment = null;
+  els.attachPreview.classList.remove('show');
+  els.attachImg.src = '';
+  els.attachName.textContent = '';
+  els.fileInput.value = '';
+}
+
+function handleFileSelect(file) {
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    toast('Only images are supported');
+    return;
+  }
+  if (file.size > CONFIG.MAX_ATTACH_BYTES) {
+    toast(`Image too large (max ${Math.round(CONFIG.MAX_ATTACH_BYTES/1024)} KB)`);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.pendingAttachment = {
+      id: uid('att'),
+      type: 'image',
+      mime: file.type,
+      name: file.name.slice(0, 60),
+      size: file.size,
+      data: e.target.result
+    };
+    els.attachImg.src = e.target.result;
+    els.attachName.textContent = `${file.name} (${Math.round(file.size/1024)} KB)`;
+    els.attachPreview.classList.add('show');
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ============================================================
+   CHANNELS / SERVERS / DMS
+   ============================================================ */
+async function createServer() {
+  const name = prompt('New server name:', 'My Server');
+  if (!name) return;
+  const srv = {
+    id: uid('srv'),
+    name: name.trim().slice(0, 40) || 'Server',
+    ownerId: state.currentUser.id,
+    memberIds: [state.currentUser.id],
+    channels: [{ id:'general', name:'general', type:'text', topic:'', messages:[] }],
+    createdAt: Date.now()
+  };
+  state.mainData.servers.push(srv);
+  try {
+    await saveMainData();
+    state.currentServerId = srv.id;
+    state.currentChatId = srv.channels[0].id;
+    state.currentChatType = 'channel';
+    state.lastHash = '';
+    renderAll();
+  } catch (e) { toast('Failed to create server'); }
+}
+
+async function deleteServer() {
+  const srv = currentServer();
+  if (!srv) return;
+  if (srv.ownerId !== state.currentUser.id) {
+    toast('Only the owner can delete this server'); return;
+  }
+  if (!confirm(`Delete server "${srv.name}" and all its channels?`)) return;
+  state.mainData.servers = state.mainData.servers.filter(s => s.id !== srv.id);
+  try {
+    await saveMainData();
+    if (state.mainData.servers.length === 0) {
+      state.mainData.servers.push(makeDefaultServer());
+      await saveMainData();
+    }
+    state.currentServerId = state.mainData.servers[0].id;
+    state.currentChatId = state.mainData.servers[0].channels[0].id;
+    state.currentChatType = 'channel';
+    state.lastHash = '';
+    renderAll();
+  } catch (e) { toast('Failed to delete server'); }
+}
+
+async function createChannelFromModal() {
+  const name = els.channelNameInput.value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+  if (!name) return;
+  const srv = currentServer();
+  if (srv.channels.some(c => c.id === name)) {
+    toast('Channel already exists'); return;
+  }
+  srv.channels.push({ id: name, name, type:'text', topic:'', messages:[] });
+  try {
+    await saveMainData();
+    els.channelModal.classList.remove('show');
+    els.channelNameInput.value = '';
+    state.currentChatId = name;
+    state.currentChatType = 'channel';
+    state.lastHash = '';
+    renderAll();
+  } catch (e) { toast('Failed to create channel'); }
+}
+
+async function deleteChannel(id) {
+  const srv = currentServer();
+  if (srv.channels.length <= 1) { toast('Must keep at least one channel'); return; }
+  if (!confirm(`Delete #${id} and all its messages?`)) return;
+  srv.channels = srv.channels.filter(c => c.id !== id);
+  if (state.currentChatId === id && state.currentChatType === 'channel') {
+    state.currentChatId = srv.channels[0].id;
+    state.lastHash = '';
+  }
+  try {
+    await saveMainData();
+    renderAll();
+  } catch (e) { toast('Failed to delete channel'); }
+}
+
+function openDmModal() {
+  els.dmModal.classList.add('show');
+  els.dmSearch.value = '';
+  renderDmUserList('');
+  setTimeout(() => els.dmSearch.focus(), 50);
+}
+
+function renderDmUserList(filter) {
+  els.dmUserList.innerHTML = '';
+  const f = filter.trim().toLowerCase();
+  const others = state.usersData.users.filter(u => u.id !== state.currentUser.id);
+  const filtered = f
+    ? others.filter(u =>
+        u.usernameLower.includes(f) ||
+        u.displayName.toLowerCase().includes(f))
+    : others;
+
+  if (filtered.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'padding:12px;color:#72767d;font-size:13px;text-align:center;';
+    empty.textContent = others.length === 0
+      ? 'No other users have registered yet.'
+      : 'No users match your search.';
+    els.dmUserList.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(u => {
+    const item = document.createElement('div');
+    item.className = 'user-pick-item';
+    item.innerHTML = `
+      <div class="avatar" style="background:${u.avatarColor}">${initials(u.displayName)}</div>
+      <div>
+        <div class="uname">${escapeHtml(u.displayName)}</div>
+        <div class="uhandle">@${escapeHtml(u.username)}</div>
+      </div>`;
+    item.addEventListener('click', () => openDmWith(u.id));
+    els.dmUserList.appendChild(item);
+  });
+}
+
+async function openDmWith(userId) {
+  // find existing dm
+  let dm = state.mainData.dms.find(d =>
+    d.participantIds.includes(state.currentUser.id) &&
+    d.participantIds.includes(userId) &&
+    d.participantIds.length === 2
+  );
+  if (!dm) {
+    dm = {
+      id: uid('dm'),
+      participantIds: [state.currentUser.id, userId],
+      messages: [],
+      createdAt: Date.now(),
+      lastMessageAt: Date.now()
+    };
+    state.mainData.dms.push(dm);
+    try { await saveMainData(); } catch (e) { toast('Failed to create DM'); return; }
+  }
+  els.dmModal.classList.remove('show');
+  state.currentChatId = dm.id;
+  state.currentChatType = 'dm';
+  state.lastHash = '';
+  renderAll();
+  els.input.focus();
+}
+
+/* ============================================================
+   TYPING INDICATOR
+   ============================================================ */
+function pingTyping() {
+  if (!state.mainData.typing) state.mainData.typing = {};
+  const key = state.currentChatId;
+  if (!state.mainData.typing[key]) state.mainData.typing[key] = {};
+  state.mainData.typing[key][state.currentUser.id] = Date.now() + 5000;
+
+  clearTimeout(state.typingDebounce);
+  state.typingDebounce = setTimeout(async () => {
+    try { await saveMainData(); } catch (e) {}
+  }, 3000);
+}
+
+function clearTyping() {
+  if (!state.mainData.typing) return;
+  const key = state.currentChatId;
+  if (state.mainData.typing[key]) {
+    delete state.mainData.typing[key][state.currentUser.id];
+  }
+}
+
+function renderTyping() {
+  const key = state.currentChatId;
+  const map = (state.mainData.typing || {})[key] || {};
+  const now = Date.now();
+  const active = Object.entries(map)
+    .filter(([uid, exp]) => exp > now && uid !== state.currentUser.id)
+    .map(([uid]) => getUserById(uid)?.displayName || 'Someone');
+
+  if (active.length === 0) {
+    els.typingIndicator.innerHTML = '';
+    return;
+  }
+  const names = active.length === 1
+    ? active[0]
+    : active.length === 2
+      ? `${active[0]} and ${active[1]}`
+      : `${active[0]} and ${active.length - 1} others`;
+  els.typingIndicator.innerHTML =
+    `<span>${escapeHtml(names)} is typing</span><span class="dots"></span>`;
+}
+
+/* ============================================================
+   POLLING
+   ============================================================ */
+let pollTimer = null;
+
+async function poll() {
+  try {
+    const [usersData, mainData] = await Promise.all([
+      apiGet(CONFIG.USERS_BIN),
+      apiGet(CONFIG.MAIN_BIN)
+    ]);
+    state.usersData = usersData;
+    const changed = JSON.stringify(state.mainData) !== JSON.stringify(mainData);
+    state.mainData = mainData;
+    if (!state.mainData.typing) state.mainData.typing = {};
+
+    if (changed) {
+      state.lastHash = '';
+      renderAll();
+    } else {
+      renderDms(); // usernames could have changed
+    }
+    renderTyping();
+    setStatus(true);
+  } catch (e) {
+    console.error('Poll error:', e);
+    setStatus(false);
+  }
+}
+
+function startPolling() {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(poll, CONFIG.POLL_MS);
+}
+
+/* ============================================================
+   EVENT LISTENERS
+   ============================================================ */
+els.authSubmit.addEventListener('click', handleAuthSubmit);
+els.authToggleLink.addEventListener('click', () => {
+  setAuthMode(authMode === 'login' ? 'register' : 'login');
+});
+els.authPassword.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); handleAuthSubmit(); }
+});
+els.authUsername.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); els.authPassword.focus(); }
+});
+
+els.logoutBtn.addEventListener('click', logout);
+
+els.sendBtn.addEventListener('click', sendMessage);
+els.input.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault(); sendMessage();
+  }
+});
+els.input.addEventListener('input', () => {
+  els.input.style.height = 'auto';
+  els.input.style.height = Math.min(els.input.scrollHeight, 120) + 'px';
+  pingTyping();
+});
+
+els.attachBtn.addEventListener('click', () => els.fileInput.click());
+els.fileInput.addEventListener('change', e => handleFileSelect(e.target.files[0]));
+els.attachRemove.addEventListener('click', clearAttachment);
+
+els.addChannelBtn.addEventListener('click', () => {
+  els.channelModal.classList.add('show');
+  els.channelNameInput.value = '';
+  setTimeout(() => els.channelNameInput.focus(), 50);
+});
+els.channelCancel.addEventListener('click', () => els.channelModal.classList.remove('show'));
+els.channelCreate.addEventListener('click', createChannelFromModal);
+els.channelNameInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') createChannelFromModal();
+});
+
+els.addDmBtn.addEventListener('click', openDmModal);
+els.dmCancel.addEventListener('click', () => els.dmModal.classList.remove('show'));
+els.dmSearch.addEventListener('input', e => renderDmUserList(e.target.value));
+
+els.deleteServer.addEventListener('click', deleteServer);
+
+els.lightbox.addEventListener('click', () => els.lightbox.classList.remove('show'));
+
+els.channelModal.addEventListener('click', e => {
+  if (e.target === els.channelModal) els.channelModal.classList.remove('show');
+});
+els.dmModal.addEventListener('click', e => {
+  if (e.target === els.dmModal) els.dmModal.classList.remove('show');
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+async function init() {
+  showLoading(true);
+  try {
+    const restored = await tryRestoreSession();
+    if (restored) {
+      await enterApp();
+    } else {
+      els.authScreen.style.display = 'flex';
+      setAuthMode('login');
+    }
+  } catch (e) {
+    console.error('Init failed:', e);
+    els.authScreen.style.display = 'flex';
+  } finally {
+    showLoading(false);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
