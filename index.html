@@ -5,169 +5,568 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mini Discord</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-  body { background: #202225; color: #dcddde; height: 100vh; overflow: hidden; }
-  #app { display: flex; height: 100vh; }
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,sans-serif; }
+  body { background:#202225; color:#dcddde; height:100vh; overflow:hidden; }
+  button { font-family:inherit; cursor:pointer; }
+  input, textarea { font-family:inherit; }
 
-  /* SIDEBAR */
+  /* ============ AUTH SCREEN ============ */
+  #auth-screen {
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,#5865f2 0%,#202225 100%); z-index:200;
+  }
+  #auth-card {
+    background:#36393f; padding:32px; border-radius:8px; width:420px;
+    box-shadow:0 8px 32px rgba(0,0,0,.5);
+  }
+  #auth-card h1 { color:#fff; font-size:24px; margin-bottom:6px; text-align:center; }
+  #auth-card p.sub { color:#b9bbbe; font-size:13px; text-align:center; margin-bottom:24px; }
+  #auth-card label { display:block; font-size:11px; font-weight:700; text-transform:uppercase;
+    color:#b9bbbe; margin-bottom:6px; letter-spacing:.02em; }
+  #auth-card input {
+    width:100%; padding:10px; background:#202225; border:1px solid #202225;
+    border-radius:4px; color:#dcddde; font-size:14px; margin-bottom:14px; outline:none;
+  }
+  #auth-card input:focus { border-color:#5865f2; }
+  #auth-submit {
+    width:100%; padding:11px; background:#5865f2; border:none; border-radius:4px;
+    color:#fff; font-size:15px; font-weight:600; margin-bottom:12px;
+  }
+  #auth-submit:hover { background:#4752c4; }
+  #auth-submit:disabled { opacity:.6; cursor:not-allowed; }
+  #auth-toggle { text-align:center; font-size:13px; color:#b9bbbe; }
+  #auth-toggle a { color:#00aff4; cursor:pointer; text-decoration:none; }
+  #auth-error {
+    background:#ed424522; border:1px solid #ed4245; color:#ed4245;
+    padding:8px 12px; border-radius:4px; font-size:13px; margin-bottom:14px; display:none;
+  }
+  #auth-error.show { display:block; }
+
+  /* ============ MAIN APP ============ */
+  #app { display:none; height:100vh; }
+  #app.ready { display:flex; }
+
+  /* SERVER RAIL (far left) */
+  #server-rail {
+    width:72px; background:#202225; display:flex; flex-direction:column;
+    align-items:center; padding:12px 0; gap:8px; overflow-y:auto;
+  }
+  .server-icon {
+    width:48px; height:48px; border-radius:50%; background:#36393f;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-size:16px; cursor:pointer;
+    transition:border-radius .15s, background .15s; position:relative;
+    flex-shrink:0;
+  }
+  .server-icon:hover { border-radius:16px; background:#5865f2; }
+  .server-icon.active { border-radius:16px; background:#5865f2; }
+  .server-icon.add { color:#3ba55d; font-size:24px; }
+  .server-icon.add:hover { background:#3ba55d; color:#fff; }
+
+  /* CHANNEL SIDEBAR */
   #sidebar {
-    width: 240px; background: #2f3136; display: flex; flex-direction: column;
-    border-right: 1px solid #202225;
+    width:240px; background:#2f3136; display:flex; flex-direction:column;
+    border-right:1px solid #202225;
   }
-  #sidebar-header {
-    padding: 16px; font-weight: bold; font-size: 15px; color: #fff;
-    background: #202225; border-bottom: 1px solid #202225;
-    display: flex; justify-content: space-between; align-items: center;
+  #server-header {
+    padding:0 16px; height:48px; display:flex; align-items:center;
+    justify-content:space-between; font-weight:700; color:#fff; font-size:15px;
+    background:#2f3136; border-bottom:1px solid #202225; box-shadow:0 1px 0 rgba(0,0,0,.2);
   }
-  #user-badge { font-size: 11px; color: #b9bbbe; font-weight: normal; cursor: pointer; }
-  #user-badge:hover { color: #fff; }
-  #channel-list { flex: 1; overflow-y: auto; padding: 8px; }
+  #server-header .close-btn { color:#b9bbbe; cursor:pointer; font-size:14px; }
+  #server-header .close-btn:hover { color:#ed4245; }
+  .section-label {
+    padding:16px 16px 4px; font-size:11px; font-weight:700;
+    text-transform:uppercase; color:#8e9297; letter-spacing:.02em;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .section-label .add-mini {
+    color:#b9bbbe; cursor:pointer; font-size:14px;
+  }
+  .section-label .add-mini:hover { color:#fff; }
+  #channel-list, #dm-list { flex-shrink:0; padding:0 8px 8px; overflow-y:auto; }
+  #channel-list { max-height:40vh; }
+  #dm-list { flex:1; overflow-y:auto; }
   .channel {
-    padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px;
-    color: #8e9297; margin-bottom: 2px; display: flex; justify-content: space-between;
+    padding:7px 10px; border-radius:4px; cursor:pointer; font-size:14px;
+    color:#8e9297; margin-bottom:1px; display:flex; justify-content:space-between;
+    align-items:center; gap:6px;
   }
-  .channel:hover { background: #393c43; color: #dcddde; }
-  .channel.active { background: #393c43; color: #fff; }
+  .channel:hover { background:#393c43; color:#dcddde; }
+  .channel.active { background:#393c43; color:#fff; }
+  .channel .name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .channel .del {
-    opacity: 0; color: #ed4245; font-size: 12px; transition: opacity .15s;
+    opacity:0; color:#ed4245; font-size:11px; transition:opacity .15s;
+    padding:2px 4px; border-radius:3px;
   }
-  .channel:hover .del { opacity: 1; }
-  #add-channel {
-    margin: 8px; padding: 8px; background: #40444b; border: none; color: #dcddde;
-    border-radius: 4px; cursor: pointer; font-size: 13px;
+  .channel:hover .del { opacity:1; }
+  .channel .del:hover { background:#ed424533; }
+  .channel .unread-dot {
+    width:8px; height:8px; border-radius:50%; background:#ed4245; flex-shrink:0;
   }
-  #add-channel:hover { background: #4f545c; }
 
-  /* MAIN CHAT */
-  #chat-area { flex: 1; display: flex; flex-direction: column; background: #36393f; }
+  /* USER BAR (bottom of sidebar) */
+  #user-bar {
+    margin-top:auto; background:#292b2f; padding:8px 10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  #user-bar .avatar {
+    width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-size:13px; flex-shrink:0;
+    position:relative;
+  }
+  #user-bar .avatar .status-dot {
+    position:absolute; bottom:-1px; right:-1px; width:12px; height:12px;
+    border-radius:50%; background:#3ba55d; border:3px solid #292b2f;
+  }
+  #user-bar .info { flex:1; min-width:0; }
+  #user-bar .uname { color:#fff; font-size:13px; font-weight:600;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #user-bar .ustatus { color:#b9bbbe; font-size:11px; }
+  #user-bar .logout {
+    background:transparent; border:none; color:#b9bbbe; cursor:pointer;
+    font-size:16px; padding:4px 6px; border-radius:3px;
+  }
+  #user-bar .logout:hover { color:#ed4245; background:#ed424522; }
+
+  /* CHAT AREA */
+  #chat-area { flex:1; display:flex; flex-direction:column; background:#36393f; min-width:0; }
   #channel-title {
-    padding: 16px; font-weight: bold; color: #fff; font-size: 15px;
-    border-bottom: 1px solid #2f3136; display: flex; align-items: center; gap: 8px;
+    padding:0 16px; height:48px; display:flex; align-items:center; gap:8px;
+    font-weight:700; color:#fff; font-size:15px;
+    border-bottom:1px solid #202225; box-shadow:0 1px 0 rgba(0,0,0,.2);
   }
-  #channel-title::before { content: '#'; color: #72767d; font-size: 20px; }
-  #messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-  .msg { display: flex; gap: 12px; }
-  .avatar {
-    width: 38px; height: 38px; border-radius: 50%; background: #5865f2;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: bold; color: #fff; flex-shrink: 0; font-size: 15px;
-  }
-  .msg-body { flex: 1; min-width: 0; }
-  .msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
-  .msg-user { color: #fff; font-weight: 600; font-size: 14px; }
-  .msg-time { color: #72767d; font-size: 11px; }
-  .msg-text { color: #dcddde; font-size: 14px; word-wrap: break-word; white-space: pre-wrap; }
+  #channel-title::before { content:'#'; color:#72767d; font-size:22px; font-weight:500; }
+  #channel-title.dm::before { content:'@'; }
 
-  /* INPUT */
-  #input-area { padding: 16px; }
+  #messages {
+    flex:1; overflow-y:auto; padding:16px; display:flex;
+    flex-direction:column; gap:2px;
+  }
+  .msg {
+    display:flex; gap:12px; padding:4px 8px; border-radius:4px;
+    position:relative; transition:background .1s;
+  }
+  .msg:hover { background:#32353b; }
+  .msg .avatar {
+    width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; color:#fff; flex-shrink:0; font-size:14px;
+  }
+  .msg-body { flex:1; min-width:0; }
+  .msg-header { display:flex; align-items:baseline; gap:8px; margin-bottom:2px; }
+  .msg-user { color:#fff; font-weight:600; font-size:14px; }
+  .msg-time { color:#72767d; font-size:11px; }
+  .msg-edited { color:#72767d; font-size:11px; font-style:italic; }
+  .msg-text { color:#dcddde; font-size:14px; word-wrap:break-word; white-space:pre-wrap; line-height:1.4; }
+  .msg.deleted .msg-text { color:#72767d; font-style:italic; }
+  .msg-attachments { margin-top:6px; display:flex; flex-direction:column; gap:6px; }
+  .msg-attachments img {
+    max-width:380px; max-height:280px; border-radius:6px; cursor:pointer;
+    border:1px solid #202225;
+  }
+  .msg-actions {
+    position:absolute; top:-10px; right:12px;
+    background:#2f3136; border:1px solid #202225; border-radius:4px;
+    display:none; padding:2px; gap:2px;
+  }
+  .msg:hover .msg-actions { display:flex; }
+  .msg-actions button {
+    background:transparent; border:none; color:#b9bbbe; padding:4px 8px;
+    border-radius:3px; font-size:12px;
+  }
+  .msg-actions button:hover { background:#393c43; color:#fff; }
+  .msg-actions button.danger:hover { background:#ed424533; color:#ed4245; }
+
+  .typing-indicator {
+    padding:0 16px 4px; font-size:12px; color:#b9bbbe;
+    height:18px; transition:opacity .2s;
+  }
+  .typing-indicator .dots::after {
+    content:''; animation:dots 1.4s infinite;
+  }
+  @keyframes dots {
+    0%   { content:''; }
+    25%  { content:'.'; }
+    50%  { content:'..'; }
+    75%  { content:'...'; }
+  }
+
+  /* INPUT AREA */
+  #input-area { padding:0 16px 16px; }
+  #attach-preview {
+    display:none; padding:8px 12px; background:#2f3136; border-radius:6px 6px 0 0;
+    border:1px solid #202225; border-bottom:none; font-size:12px; color:#b9bbbe;
+    align-items:center; gap:8px;
+  }
+  #attach-preview.show { display:flex; }
+  #attach-preview img { max-height:60px; border-radius:4px; }
+  #attach-preview .remove {
+    margin-left:auto; color:#ed4245; cursor:pointer; font-size:14px;
+  }
   #input-wrapper {
-    background: #40444b; border-radius: 8px; display: flex; align-items: center;
-    padding: 0 12px;
+    background:#40444b; border-radius:8px; display:flex; align-items:center;
+    padding:0 12px; gap:6px;
   }
   #message-input {
-    flex: 1; background: transparent; border: none; outline: none; color: #dcddde;
-    padding: 12px 8px; font-size: 14px;
+    flex:1; background:transparent; border:none; outline:none; color:#dcddde;
+    padding:12px 6px; font-size:14px; resize:none; max-height:120px;
+    font-family:inherit;
   }
+  #attach-btn {
+    background:transparent; border:none; color:#b9bbbe; font-size:18px;
+    cursor:pointer; padding:8px; border-radius:4px;
+  }
+  #attach-btn:hover { color:#fff; }
   #send-btn {
-    background: transparent; border: none; color: #b9bbbe; cursor: pointer;
-    font-size: 18px; padding: 8px; border-radius: 4px;
+    background:transparent; border:none; color:#b9bbbe; font-size:18px;
+    cursor:pointer; padding:8px; border-radius:4px;
   }
-  #send-btn:hover { color: #5865f2; }
-  #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  #send-btn:hover { color:#5865f2; }
+  #send-btn:disabled { opacity:.4; cursor:not-allowed; }
 
-  /* LOADING OVERLAY */
+  /* MODALS */
+  .modal-backdrop {
+    position:fixed; inset:0; background:rgba(0,0,0,.7); display:none;
+    align-items:center; justify-content:center; z-index:150;
+  }
+  .modal-backdrop.show { display:flex; }
+  .modal {
+    background:#36393f; border-radius:8px; padding:24px; width:400px;
+    max-height:80vh; overflow-y:auto;
+  }
+  .modal h2 { color:#fff; font-size:18px; margin-bottom:16px; }
+  .modal p { color:#b9bbbe; font-size:13px; margin-bottom:16px; }
+  .modal input, .modal select {
+    width:100%; padding:10px; background:#202225; border:1px solid #202225;
+    border-radius:4px; color:#dcddde; font-size:14px; margin-bottom:14px; outline:none;
+  }
+  .modal input:focus, .modal select:focus { border-color:#5865f2; }
+  .modal-actions { display:flex; gap:8px; justify-content:flex-end; }
+  .modal-actions button {
+    padding:9px 16px; border:none; border-radius:4px; font-size:14px;
+    font-weight:600;
+  }
+  .btn-primary { background:#5865f2; color:#fff; }
+  .btn-primary:hover { background:#4752c4; }
+  .btn-secondary { background:transparent; color:#dcddde; }
+  .btn-secondary:hover { text-decoration:underline; }
+  .user-pick-item {
+    padding:10px 12px; border-radius:4px; cursor:pointer;
+    display:flex; align-items:center; gap:10px; margin-bottom:4px;
+  }
+  .user-pick-item:hover { background:#40444b; }
+  .user-pick-item .avatar {
+    width:32px; height:32px; border-radius:50%; display:flex;
+    align-items:center; justify-content:center; color:#fff; font-weight:700;
+    font-size:12px;
+  }
+
+  /* LIGHTBOX */
+  #lightbox {
+    position:fixed; inset:0; background:rgba(0,0,0,.9);
+    display:none; align-items:center; justify-content:center;
+    z-index:300; cursor:zoom-out;
+  }
+  #lightbox.show { display:flex; }
+  #lightbox img { max-width:90vw; max-height:90vh; border-radius:6px; }
+
+  /* TOAST */
+  #toast {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px);
+    background:#ed4245; color:#fff; padding:12px 20px; border-radius:6px;
+    font-size:14px; z-index:400; transition:transform .3s; box-shadow:0 4px 20px rgba(0,0,0,.4);
+  }
+  #toast.show { transform:translateX(-50%) translateY(0); }
+  #toast.success { background:#3ba55d; }
+
+  /* LOADING + STATUS */
   #loading {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-    display: none; align-items: center; justify-content: center;
-    z-index: 100; color: #fff; font-size: 14px;
+    position:fixed; inset:0; background:rgba(0,0,0,.6);
+    display:none; align-items:center; justify-content:center;
+    z-index:500; color:#fff; font-size:14px;
   }
-  #loading.show { display: flex; }
-
-  /* STATUS DOT */
+  #loading.show { display:flex; }
   #status {
-    position: fixed; bottom: 8px; right: 12px; font-size: 11px;
-    color: #72767d; display: flex; align-items: center; gap: 6px;
+    position:fixed; bottom:8px; right:12px; font-size:11px;
+    color:#72767d; display:flex; align-items:center; gap:6px;
+    z-index:60; pointer-events:none;
   }
-  #status .dot { width: 8px; height: 8px; border-radius: 50%; background: #ed4245; }
-  #status.online .dot { background: #3ba55d; }
+  #status .dot { width:8px; height:8px; border-radius:50%; background:#ed4245; }
+  #status.online .dot { background:#3ba55d; }
 
-  ::-webkit-scrollbar { width: 8px; }
-  ::-webkit-scrollbar-thumb { background: #202225; border-radius: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb { background:#202225; border-radius:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+
+  @media (max-width:700px) {
+    #sidebar { width:200px; }
+    #server-rail { width:60px; }
+    .server-icon { width:42px; height:42px; }
+  }
 </style>
 </head>
 <body>
+
+<!-- ============ AUTH SCREEN ============ -->
+<div id="auth-screen">
+  <div id="auth-card">
+    <h1 id="auth-title">Welcome Back</h1>
+    <p class="sub" id="auth-sub">Log in to continue to Mini Discord</p>
+    <div id="auth-error"></div>
+    <label for="auth-email">Email</label>
+    <input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email">
+    <label for="auth-name" id="auth-name-label" style="display:none;">Display Name</label>
+    <input id="auth-name" type="text" placeholder="Alice" maxlength="24" style="display:none;">
+    <label for="auth-password">Password</label>
+    <input id="auth-password" type="password" placeholder="••••••••" autocomplete="current-password">
+    <button id="auth-submit">Log In</button>
+    <div id="auth-toggle">
+      <span id="auth-toggle-text">Need an account?</span>
+      <a id="auth-toggle-link">Register</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
 <div id="app">
+  <div id="server-rail"></div>
   <div id="sidebar">
-    <div id="sidebar-header">
-      <span>💬 Mini Discord</span>
-      <span id="user-badge" title="Click to change username">You</span>
+    <div id="server-header">
+      <span id="server-name">Loading…</span>
+      <span class="close-btn" id="delete-server" title="Delete server">✕</span>
+    </div>
+    <div class="section-label">
+      <span>Text Channels</span>
+      <span class="add-mini" id="add-channel-btn" title="New channel">＋</span>
     </div>
     <div id="channel-list"></div>
-    <button id="add-channel">+ Add Channel</button>
+    <div class="section-label">
+      <span>Direct Messages</span>
+      <span class="add-mini" id="add-dm-btn" title="New DM">＋</span>
+    </div>
+    <div id="dm-list"></div>
+    <div id="user-bar">
+      <div class="avatar" id="user-avatar">
+        <span id="user-initials">?</span>
+        <div class="status-dot"></div>
+      </div>
+      <div class="info">
+        <div class="uname" id="user-name">…</div>
+        <div class="ustatus">Online</div>
+      </div>
+      <button class="logout" id="logout-btn" title="Log out">⎋</button>
+    </div>
   </div>
 
   <div id="chat-area">
     <div id="channel-title">general</div>
     <div id="messages"></div>
+    <div class="typing-indicator" id="typing-indicator"></div>
     <div id="input-area">
-      <div id="input-wrapper">
-        <input id="message-input" type="text" placeholder="Message #general" maxlength="500">
-        <button id="send-btn">➤</button>
+      <div id="attach-preview">
+        <img id="attach-img" alt="">
+        <span id="attach-name"></span>
+        <span class="remove" id="attach-remove">✕</span>
       </div>
+      <div id="input-wrapper">
+        <button id="attach-btn" title="Attach image">📎</button>
+        <textarea id="message-input" rows="1" placeholder="Message #general" maxlength="2000"></textarea>
+        <button id="send-btn" title="Send">➤</button>
+      </div>
+      <input type="file" id="file-input" accept="image/*" style="display:none;">
     </div>
   </div>
 </div>
 
+<!-- MODALS -->
+<div class="modal-backdrop" id="channel-modal">
+  <div class="modal">
+    <h2>Create Channel</h2>
+    <p>Channels are where your members communicate.</p>
+    <input id="channel-name-input" placeholder="new-channel" maxlength="24" autofocus>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="channel-cancel">Cancel</button>
+      <button class="btn-primary" id="channel-create">Create</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="dm-modal">
+  <div class="modal">
+    <h2>New Direct Message</h2>
+    <p>Pick a user to start a private conversation.</p>
+    <input id="dm-search" placeholder="Search users by email or name…">
+    <div id="dm-user-list" style="max-height:300px; overflow-y:auto;"></div>
+    <div class="modal-actions" style="margin-top:12px;">
+      <button class="btn-secondary" id="dm-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="lightbox"><img id="lightbox-img" alt=""></div>
+<div id="toast"></div>
 <div id="loading">Loading…</div>
 <div id="status"><span class="dot"></span><span id="status-text">connecting…</span></div>
 
 <script>
-/* ============ CONFIG ============ */
+/* ============================================================
+   CONFIG
+   ============================================================ */
 const CONFIG = {
-  BIN_ID: '6aaaefcdffd5d160530f6e45',
-  API_KEY: '$2a$10$Wt9uWCbOUzdn7kj5BqbXfO/nNtmZNWyk9N/zDECtyLRmY/j1Uqk7K',
+  MAIN_BIN: '6aaaefcdffd5d160530f6e45',
+  USERS_BIN: '6aaaf192ac6210605ad5e308',
+  API_KEY: '$2a$10$uyUmMlWjsXk3ZqRnP/mYI.yyggpk7wmFK7ECpg3LDPRy4v8wTk52i',
   BASE_URL: 'https://api.jsonbin.io/v3/b/',
-  REFRESH_INTERVAL: 10000 // 10s - keeps you under free tier limits
+  POLL_MS: 10000,
+  SESSION_HOURS: 24,
+  MAX_ATTACH_BYTES: 80 * 1024 // 80 KB
 };
 
-/* ============ STATE ============ */
+/* ============================================================
+   STATE
+   ============================================================ */
 const state = {
-  data: null,
-  currentChannel: null,
-  username: localStorage.getItem('md_username') || 'You',
+  usersData: null,
+  mainData: null,
+  currentUser: null,
+  currentServerId: null,
+  currentChatId: null,   // channel id or dm id
+  currentChatType: null, // 'channel' | 'dm'
   isSending: false,
-  lastRenderHash: ''
+  pendingAttachment: null,
+  lastHash: '',
+  typingDebounce: null,
+  myTypingPinged: false
 };
 
-/* ============ DOM ============ */
+/* ============================================================
+   DOM HELPERS
+   ============================================================ */
 const $ = id => document.getElementById(id);
 const els = {
-  channelList: $('channel-list'),
-  messages: $('messages'),
-  channelTitle: $('channel-title'),
-  input: $('message-input'),
-  sendBtn: $('send-btn'),
-  addChannel: $('add-channel'),
-  loading: $('loading'),
-  userBadge: $('user-badge'),
-  status: $('status'),
-  statusText: $('status-text')
+  authScreen: $('auth-screen'), authTitle: $('auth-title'), authSub: $('auth-sub'),
+  authError: $('auth-error'), authEmail: $('auth-email'), authName: $('auth-name'),
+  authNameLabel: $('auth-name-label'), authPassword: $('auth-password'),
+  authSubmit: $('auth-submit'), authToggleText: $('auth-toggle-text'),
+  authToggleLink: $('auth-toggle-link'),
+  app: $('app'),
+  serverRail: $('server-rail'), sidebar: $('sidebar'),
+  serverName: $('server-name'), deleteServer: $('delete-server'),
+  channelList: $('channel-list'), dmList: $('dm-list'),
+  addChannelBtn: $('add-channel-btn'), addDmBtn: $('add-dm-btn'),
+  userAvatar: $('user-avatar'), userInitials: $('user-initials'),
+  userName: $('user-name'), logoutBtn: $('logout-btn'),
+  channelTitle: $('channel-title'), messages: $('messages'),
+  typingIndicator: $('typing-indicator'),
+  input: $('message-input'), sendBtn: $('send-btn'),
+  attachBtn: $('attach-btn'), fileInput: $('file-input'),
+  attachPreview: $('attach-preview'), attachImg: $('attach-img'),
+  attachName: $('attach-name'), attachRemove: $('attach-remove'),
+  channelModal: $('channel-modal'), channelNameInput: $('channel-name-input'),
+  channelCancel: $('channel-cancel'), channelCreate: $('channel-create'),
+  dmModal: $('dm-modal'), dmSearch: $('dm-search'),
+  dmUserList: $('dm-user-list'), dmCancel: $('dm-cancel'),
+  lightbox: $('lightbox'), lightboxImg: $('lightbox-img'),
+  toast: $('toast'), loading: $('loading'),
+  status: $('status'), statusText: $('status-text')
 };
 
-/* ============ API ============ */
-async function fetchData() {
-  const res = await fetch(CONFIG.BASE_URL + CONFIG.BIN_ID + '/latest', {
-    headers: { 'X-Master-Key': CONFIG.API_KEY }
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function setStatus(online) {
+  els.status.classList.toggle('online', online);
+  els.statusText.textContent = online ? 'synced' : 'offline';
+}
+function showLoading(s) { els.loading.classList.toggle('show', s); }
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+function timeStr(ts) {
+  return new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+}
+function relTime(ts) {
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h ago';
+  return new Date(ts).toLocaleDateString();
+}
+function avatarColor(name) {
+  const colors = ['#5865f2','#3ba55d','#faa61a','#ed4245','#eb459e','#00b0f4','#9b59b6','#e67e22'];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return colors[h % colors.length];
+}
+function initials(name) { return name.trim().slice(0, 2).toUpperCase(); }
+function uid(prefix) {
+  return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+}
+function toast(msg, success = false) {
+  els.toast.textContent = msg;
+  els.toast.classList.toggle('success', success);
+  els.toast.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => els.toast.classList.remove('show'), 3000);
+}
+
+/* ============================================================
+   CRYPTO — PBKDF2 password hashing via WebCrypto
+   ============================================================ */
+async function hashPassword(password) {
+  const enc = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iterations = 100000;
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name:'PBKDF2', salt, iterations, hash:'SHA-256' },
+    keyMaterial, 256
+  );
+  const saltB64 = btoa(String.fromCharCode(...salt));
+  const hashB64 = btoa(String.fromCharCode(...new Uint8Array(bits)));
+  return `pbkdf2$${iterations}$${saltB64}$${hashB64}`;
+}
+async function verifyPassword(password, stored) {
+  try {
+    const [algo, iterStr, saltB64, expectedB64] = stored.split('$');
+    if (algo !== 'pbkdf2') return false;
+    const iterations = parseInt(iterStr, 10);
+    const salt = Uint8Array.from(atob(saltB64), c => c.charCodeAt(0));
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
+    );
+    const bits = await crypto.subtle.deriveBits(
+      { name:'PBKDF2', salt, iterations, hash:'SHA-256' },
+      keyMaterial, 256
+    );
+    const actualB64 = btoa(String.fromCharCode(...new Uint8Array(bits)));
+    return actualB64 === expectedB64;
+  } catch { return false; }
+}
+
+/* ============================================================
+   JSONBIN API
+   ============================================================ */
+async function apiGet(binId) {
+  const res = await fetch(CONFIG.BASE_URL + binId + '/latest', {
+    headers: { 'X-Master-Key': CONFIG.API_KEY },
+    cache: 'no-store'
   });
-  if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+  if (!res.ok) throw new Error('GET failed ' + res.status);
   const json = await res.json();
   return json.record;
 }
-
-async function saveData(data) {
-  data.lastUpdated = Date.now();
-  const res = await fetch(CONFIG.BASE_URL + CONFIG.BIN_ID, {
+async function apiPut(binId, data) {
+  const res = await fetch(CONFIG.BASE_URL + binId, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -175,273 +574,118 @@ async function saveData(data) {
     },
     body: JSON.stringify(data)
   });
-  if (!res.ok) throw new Error('Save failed: ' + res.status);
+  if (!res.ok) throw new Error('PUT failed ' + res.status);
   return res.json();
 }
 
-/* ============ HELPERS ============ */
-function setStatus(online) {
-  els.status.classList.toggle('online', online);
-  els.statusText.textContent = online ? 'synced' : 'offline';
-}
+/* ============================================================
+   AUTH FLOW
+   ============================================================ */
+let authMode = 'login'; // 'login' | 'register'
 
-function showLoading(show) {
-  els.loading.classList.toggle('show', show);
-}
-
-function timeStr(ts) {
-  const d = new Date(ts);
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function avatarColor(name) {
-  const colors = ['#5865f2','#3ba55d','#faa61a','#ed4245','#eb459e','#00b0f4'];
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
-  return colors[h % colors.length];
-}
-
-function initials(name) {
-  return name.trim().slice(0, 2).toUpperCase();
-}
-
-function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
-}
-
-/* ============ RENDER ============ */
-function renderChannels() {
-  els.channelList.innerHTML = '';
-  state.data.channels.forEach(ch => {
-    const div = document.createElement('div');
-    div.className = 'channel' + (ch.id === state.currentChannel ? ' active' : '');
-    div.innerHTML = `<span># ${escapeHtml(ch.name)}</span>
-                     <span class="del" data-id="${ch.id}" title="Delete">✕</span>`;
-    div.addEventListener('click', e => {
-      if (e.target.classList.contains('del')) return;
-      switchChannel(ch.id);
-    });
-    div.querySelector('.del').addEventListener('click', e => {
-      e.stopPropagation();
-      deleteChannel(ch.id);
-    });
-    els.channelList.appendChild(div);
-  });
-}
-
-function renderMessages() {
-  const ch = state.data.channels.find(c => c.id === state.currentChannel);
-  if (!ch) return;
-
-  // Scroll preservation
-  const wasAtBottom =
-    els.messages.scrollHeight - els.messages.scrollTop - els.messages.clientHeight < 60;
-
-  els.channelTitle.textContent = ch.name;
-  els.input.placeholder = `Message #${ch.name}`;
-
-  const hash = ch.id + '::' + ch.messages.length + '::' +
-               (ch.messages[ch.messages.length - 1]?.id || '');
-  if (hash === state.lastRenderHash) {
-    if (wasAtBottom) els.messages.scrollTop = els.messages.scrollHeight;
-    return;
-  }
-  state.lastRenderHash = hash;
-
-  els.messages.innerHTML = '';
-  if (ch.messages.length === 0) {
-    const empty = document.createElement('div');
-    empty.style.cssText = 'color:#72767d;font-size:13px;text-align:center;margin-top:40px;';
-    empty.textContent = `This is the beginning of #${ch.name}. Say hi!`;
-    els.messages.appendChild(empty);
+function setAuthMode(mode) {
+  authMode = mode;
+  if (mode === 'login') {
+    els.authTitle.textContent = 'Welcome Back';
+    els.authSub.textContent = 'Log in to continue to Mini Discord';
+    els.authSubmit.textContent = 'Log In';
+    els.authToggleText.textContent = 'Need an account?';
+    els.authToggleLink.textContent = 'Register';
+    els.authName.style.display = 'none';
+    els.authNameLabel.style.display = 'none';
+    els.authPassword.autocomplete = 'current-password';
   } else {
-    ch.messages.forEach(m => {
-      const div = document.createElement('div');
-      div.className = 'msg';
-      div.innerHTML = `
-        <div class="avatar" style="background:${avatarColor(m.user)}">${initials(m.user)}</div>
-        <div class="msg-body">
-          <div class="msg-header">
-            <span class="msg-user">${escapeHtml(m.user)}</span>
-            <span class="msg-time">${timeStr(m.timestamp)}</span>
-          </div>
-          <div class="msg-text">${escapeHtml(m.text)}</div>
-        </div>`;
-      els.messages.appendChild(div);
-    });
+    els.authTitle.textContent = 'Create an Account';
+    els.authSub.textContent = 'Sign up to start chatting';
+    els.authSubmit.textContent = 'Register';
+    els.authToggleText.textContent = 'Already have an account?';
+    els.authToggleLink.textContent = 'Log In';
+    els.authName.style.display = 'block';
+    els.authNameLabel.style.display = 'block';
+    els.authPassword.autocomplete = 'new-password';
   }
-
-  if (wasAtBottom || ch.messages.length <= 1) {
-    els.messages.scrollTop = els.messages.scrollHeight;
-  }
+  els.authError.classList.remove('show');
 }
 
-function renderAll() {
-  renderChannels();
-  renderMessages();
+function showAuthError(msg) {
+  els.authError.textContent = msg;
+  els.authError.classList.add('show');
 }
 
-/* ============ ACTIONS ============ */
-async function sendMessage() {
-  const text = els.input.value.trim();
-  if (!text || state.isSending) return;
+async function handleAuthSubmit() {
+  const email = els.authEmail.value.trim().toLowerCase();
+  const password = els.authPassword.value;
+  const name = els.authName.value.trim();
 
-  state.isSending = true;
-  els.sendBtn.disabled = true;
-  els.input.value = '';
+  if (!email || !email.includes('@')) return showAuthError('Please enter a valid email.');
+  if (password.length < 6) return showAuthError('Password must be at least 6 characters.');
+  if (authMode === 'register' && !name) return showAuthError('Please enter a display name.');
+
+  els.authSubmit.disabled = true;
+  els.authSubmit.textContent = authMode === 'login' ? 'Logging in…' : 'Creating account…';
+  showLoading(true);
 
   try {
-    const ch = state.data.channels.find(c => c.id === state.currentChannel);
-    ch.messages.push({
-      id: 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-      user: state.username,
-      text,
-      timestamp: Date.now()
-    });
-    // trim to last 500 messages per channel
-    if (ch.messages.length > 500) ch.messages = ch.messages.slice(-500);
+    // fresh fetch of users
+    const usersData = await apiGet(CONFIG.USERS_BIN);
+    state.usersData = usersData;
 
-    await saveData(state.data);
-    state.lastRenderHash = ''; // force re-render
-    renderMessages();
-    setStatus(true);
+    if (authMode === 'register') {
+      if (usersData.users.some(u => u.emailLower === email)) {
+        throw new Error('An account with this email already exists.');
+      }
+      const passwordHash = await hashPassword(password);
+      const user = {
+        id: uid('u'),
+        email,
+        emailLower: email,
+        displayName: name.slice(0, 24),
+        passwordHash,
+        avatarColor: avatarColor(email),
+        createdAt: Date.now(),
+        lastLoginAt: Date.now(),
+        status: 'online',
+        friends: [],
+        dmChannels: []
+      };
+      usersData.users.push(user);
+      // create session
+      const session = makeSession(user.id);
+      usersData.sessions = pruneSessions(usersData.sessions || []);
+      usersData.sessions.push(session);
+      await apiPut(CONFIG.USERS_BIN, usersData);
+      state.currentUser = user;
+      localStorage.setItem('md_session', session.token);
+      toast('Account created! Welcome 🎉', true);
+    } else {
+      const user = usersData.users.find(u => u.emailLower === email);
+      if (!user) throw new Error('No account found with that email.');
+      const ok = await verifyPassword(password, user.passwordHash);
+      if (!ok) throw new Error('Incorrect password.');
+      user.lastLoginAt = Date.now();
+      user.status = 'online';
+      const session = makeSession(user.id);
+      usersData.sessions = pruneSessions(usersData.sessions || []);
+      usersData.sessions.push(session);
+      await apiPut(CONFIG.USERS_BIN, usersData);
+      state.currentUser = user;
+      localStorage.setItem('md_session', session.token);
+    }
+
+    // success — enter app
+    els.authPassword.value = '';
+    await enterApp();
   } catch (e) {
     console.error(e);
-    setStatus(false);
-    alert('Failed to send message. Check console.');
+    showAuthError(e.message || 'Something went wrong.');
   } finally {
-    state.isSending = false;
-    els.sendBtn.disabled = false;
-    els.input.focus();
-  }
-}
-
-async function createChannel() {
-  const name = prompt('New channel name (no spaces):');
-  if (!name) return;
-  const clean = name.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
-  if (!clean) return;
-  if (state.data.channels.some(c => c.id === clean)) {
-    alert('Channel already exists.');
-    return;
-  }
-  state.data.channels.push({ id: clean, name: clean, messages: [] });
-  try {
-    await saveData(state.data);
-    switchChannel(clean);
-    renderChannels();
-  } catch (e) {
-    alert('Failed to create channel.');
-  }
-}
-
-async function deleteChannel(id) {
-  if (state.data.channels.length <= 1) {
-    alert('You must keep at least one channel.');
-    return;
-  }
-  if (!confirm(`Delete #${id} and all its messages?`)) return;
-  state.data.channels = state.data.channels.filter(c => c.id !== id);
-  if (state.currentChannel === id) {
-    state.currentChannel = state.data.channels[0].id;
-    state.lastRenderHash = '';
-  }
-  try {
-    await saveData(state.data);
-    renderAll();
-  } catch (e) {
-    alert('Failed to delete channel.');
-  }
-}
-
-function switchChannel(id) {
-  state.currentChannel = id;
-  state.lastRenderHash = '';
-  renderAll();
-  els.input.focus();
-}
-
-function changeUsername() {
-  const n = prompt('Your display name:', state.username);
-  if (!n) return;
-  const clean = n.trim().slice(0, 24) || 'You';
-  state.username = clean;
-  localStorage.setItem('md_username', clean);
-  els.userBadge.textContent = clean;
-}
-
-/* ============ POLLING ============ */
-let pollTimer = null;
-
-async function poll() {
-  try {
-    const fresh = await fetchData();
-    if (!fresh || !Array.isArray(fresh.channels)) throw new Error('Bad data');
-
-    // Detect new messages from others
-    const prev = state.data;
-    state.data = fresh;
-
-    if (!state.data.channels.find(c => c.id === state.currentChannel)) {
-      state.currentChannel = state.data.channels[0]?.id || null;
-    }
-
-    // Only re-render if something changed
-    const changed = JSON.stringify(prev) !== JSON.stringify(fresh);
-    if (changed) {
-      state.lastRenderHash = '';
-      renderAll();
-    }
-    setStatus(true);
-  } catch (e) {
-    console.error('Poll error:', e);
-    setStatus(false);
-  }
-}
-
-function startPolling() {
-  clearInterval(pollTimer);
-  pollTimer = setInterval(poll, CONFIG.REFRESH_INTERVAL);
-}
-
-/* ============ INIT ============ */
-async function init() {
-  els.userBadge.textContent = state.username;
-  showLoading(true);
-  try {
-    state.data = await fetchData();
-    if (!state.data || !Array.isArray(state.data.channels) || state.data.channels.length === 0) {
-      state.data = { channels: [{ id: 'general', name: 'general', messages: [] }], lastUpdated: 0 };
-      await saveData(state.data);
-    }
-    state.currentChannel = state.data.channels[0].id;
-    renderAll();
-    setStatus(true);
-    startPolling();
-  } catch (e) {
-    console.error('Init error:', e);
-    setStatus(false);
-    alert('Failed to load data. Check your Bin ID and Master Key, and make sure CORS is allowed.');
-  } finally {
+    els.authSubmit.disabled = false;
+    els.authSubmit.textContent = authMode === 'login' ? 'Log In' : 'Register';
     showLoading(false);
-    els.input.focus();
   }
 }
 
-/* ============ EVENTS ============ */
-els.sendBtn.addEventListener('click', sendMessage);
-els.input.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-});
-els.addChannel.addEventListener('click', createChannel);
-els.userBadge.addEventListener('click', changeUsername);
-
-document.addEventListener('DOMContentLoaded', init);
-</script>
-</body>
-</html>
+function makeSession(userId) {
+  const now = Date.now();
+  return {
+    token: uid
