@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Discord</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { background: #202225; color: #dcddde; height: 100vh; overflow: hidden; }
+  #app { display: flex; height: 100vh; }
+
+  /* SIDEBAR */
+  #sidebar {
+    width: 240px; background: #2f3136; display: flex; flex-direction: column;
+    border-right: 1px solid #202225;
+  }
+  #sidebar-header {
+    padding: 16px; font-weight: bold; font-size: 15px; color: #fff;
+    background: #202225; border-bottom: 1px solid #202225;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  #user-badge { font-size: 11px; color: #b9bbbe; font-weight: normal; cursor: pointer; }
+  #user-badge:hover { color: #fff; }
+  #channel-list { flex: 1; overflow-y: auto; padding: 8px; }
+  .channel {
+    padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px;
+    color: #8e9297; margin-bottom: 2px; display: flex; justify-content: space-between;
+  }
+  .channel:hover { background: #393c43; color: #dcddde; }
+  .channel.active { background: #393c43; color: #fff; }
+  .channel .del {
+    opacity: 0; color: #ed4245; font-size: 12px; transition: opacity .15s;
+  }
+  .channel:hover .del { opacity: 1; }
+  #add-channel {
+    margin: 8px; padding: 8px; background: #40444b; border: none; color: #dcddde;
+    border-radius: 4px; cursor: pointer; font-size: 13px;
+  }
+  #add-channel:hover { background: #4f545c; }
+
+  /* MAIN CHAT */
+  #chat-area { flex: 1; display: flex; flex-direction: column; background: #36393f; }
+  #channel-title {
+    padding: 16px; font-weight: bold; color: #fff; font-size: 15px;
+    border-bottom: 1px solid #2f3136; display: flex; align-items: center; gap: 8px;
+  }
+  #channel-title::before { content: '#'; color: #72767d; font-size: 20px; }
+  #messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { display: flex; gap: 12px; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%; background: #5865f2;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; color: #fff; flex-shrink: 0; font-size: 15px;
+  }
+  .msg-body { flex: 1; min-width: 0; }
+  .msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+  .msg-user { color: #fff; font-weight: 600; font-size: 14px; }
+  .msg-time { color: #72767d; font-size: 11px; }
+  .msg-text { color: #dcddde; font-size: 14px; word-wrap: break-word; white-space: pre-wrap; }
+
+  /* INPUT */
+  #input-area { padding: 16px; }
+  #input-wrapper {
+    background: #40444b; border-radius: 8px; display: flex; align-items: center;
+    padding: 0 12px;
+  }
+  #message-input {
+    flex: 1; background: transparent; border: none; outline: none; color: #dcddde;
+    padding: 12px 8px; font-size: 14px;
+  }
+  #send-btn {
+    background: transparent; border: none; color: #b9bbbe; cursor: pointer;
+    font-size: 18px; padding: 8px; border-radius: 4px;
+  }
+  #send-btn:hover { color: #5865f2; }
+  #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* LOADING OVERLAY */
+  #loading {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; color: #fff; font-size: 14px;
+  }
+  #loading.show { display: flex; }
+
+  /* STATUS DOT */
+  #status {
+    position: fixed; bottom: 8px; right: 12px; font-size: 11px;
+    color: #72767d; display: flex; align-items: center; gap: 6px;
+  }
+  #status .dot { width: 8px; height: 8px; border-radius: 50%; background: #ed4245; }
+  #status.online .dot { background: #3ba55d; }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: #202225; border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <span>💬 Mini Discord</span>
+      <span id="user-badge" title="Click to change username">You</span>
+    </div>
+    <div id="channel-list"></div>
+    <button id="add-channel">+ Add Channel</button>
+  </div>
+
+  <div id="chat-area">
+    <div id="channel-title">general</div>
+    <div id="messages"></div>
+    <div id="input-area">
+      <div id="input-wrapper">
+        <input id="message-input" type="text" placeholder="Message #general" maxlength="500">
+        <button id="send-btn">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loading">Loading…</div>
+<div id="status"><span class="dot"></span><span id="status-text">connecting…</span></div>
+
+<script>
+/* ============ CONFIG ============ */
+const CONFIG = {
+  BIN_ID: '6aaaefcdffd5d160530f6e45',
+  API_KEY: '$2a$10$Wt9uWCbOUzdn7kj5BqbXfO/nNtmZNWyk9N/zDECtyLRmY/j1Uqk7K',
+  BASE_URL: 'https://api.jsonbin.io/v3/b/',
+  REFRESH_INTERVAL: 10000 // 10s - keeps you under free tier limits
+};
+
+/* ============ STATE ============ */
+const state = {
+  data: null,
+  currentChannel: null,
+  username: localStorage.getItem('md_username') || 'You',
+  isSending: false,
+  lastRenderHash: ''
+};
+
+/* ============ DOM ============ */
+const $ = id => document.getElementById(id);
+const els = {
+  channelList: $('channel-list'),
+  messages: $('messages'),
+  channelTitle: $('channel-title'),
+  input: $('message-input'),
+  sendBtn: $('send-btn'),
+  addChannel: $('add-channel'),
+  loading: $('loading'),
+  userBadge: $('user-badge'),
+  status: $('status'),
+  statusText: $('status-text')
+};
+
+/* ============ API ============ */
+async function fetchData() {
+  const res = await fetch(CONFIG.BASE_URL + CONFIG.BIN_ID + '/latest', {
+    headers: { 'X-Master-Key': CONFIG.API_KEY }
+  });
+  if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+  const json = await res.json();
+  return json.record;
+}
+
+async function saveData(data) {
+  data.lastUpdated = Date.now();
+  const res = await fetch(CONFIG.BASE_URL + CONFIG.BIN_ID, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': CONFIG.API_KEY
+    },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error('Save failed: ' + res.status);
+  return res.json();
+}
+
+/* ============ HELPERS ============ */
+function setStatus(online) {
+  els.status.classList.toggle('online', online);
+  els.statusText.textContent = online ? 'synced' : 'offline';
+}
+
+function showLoading(show) {
+  els.loading.classList.toggle('show', show);
+}
+
+function timeStr(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function avatarColor(name) {
+  const colors = ['#5865f2','#3ba55d','#faa61a','#ed4245','#eb459e','#00b0f4'];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return colors[h % colors.length];
+}
+
+function initials(name) {
+  return name.trim().slice(0, 2).toUpperCase();
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+/* ============ RENDER ============ */
+function renderChannels() {
+  els.channelList.innerHTML = '';
+  state.data.channels.forEach(ch => {
+    const div = document.createElement('div');
+    div.className = 'channel' + (ch.id === state.currentChannel ? ' active' : '');
+    div.innerHTML = `<span># ${escapeHtml(ch.name)}</span>
+                     <span class="del" data-id="${ch.id}" title="Delete">✕</span>`;
+    div.addEventListener('click', e => {
+      if (e.target.classList.contains('del')) return;
+      switchChannel(ch.id);
+    });
+    div.querySelector('.del').addEventListener('click', e => {
+      e.stopPropagation();
+      deleteChannel(ch.id);
+    });
+    els.channelList.appendChild(div);
+  });
+}
+
+function renderMessages() {
+  const ch = state.data.channels.find(c => c.id === state.currentChannel);
+  if (!ch) return;
+
+  // Scroll preservation
+  const wasAtBottom =
+    els.messages.scrollHeight - els.messages.scrollTop - els.messages.clientHeight < 60;
+
+  els.channelTitle.textContent = ch.name;
+  els.input.placeholder = `Message #${ch.name}`;
+
+  const hash = ch.id + '::' + ch.messages.length + '::' +
+               (ch.messages[ch.messages.length - 1]?.id || '');
+  if (hash === state.lastRenderHash) {
+    if (wasAtBottom) els.messages.scrollTop = els.messages.scrollHeight;
+    return;
+  }
+  state.lastRenderHash = hash;
+
+  els.messages.innerHTML = '';
+  if (ch.messages.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'color:#72767d;font-size:13px;text-align:center;margin-top:40px;';
+    empty.textContent = `This is the beginning of #${ch.name}. Say hi!`;
+    els.messages.appendChild(empty);
+  } else {
+    ch.messages.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'msg';
+      div.innerHTML = `
+        <div class="avatar" style="background:${avatarColor(m.user)}">${initials(m.user)}</div>
+        <div class="msg-body">
+          <div class="msg-header">
+            <span class="msg-user">${escapeHtml(m.user)}</span>
+            <span class="msg-time">${timeStr(m.timestamp)}</span>
+          </div>
+          <div class="msg-text">${escapeHtml(m.text)}</div>
+        </div>`;
+      els.messages.appendChild(div);
+    });
+  }
+
+  if (wasAtBottom || ch.messages.length <= 1) {
+    els.messages.scrollTop = els.messages.scrollHeight;
+  }
+}
+
+function renderAll() {
+  renderChannels();
+  renderMessages();
+}
+
+/* ============ ACTIONS ============ */
+async function sendMessage() {
+  const text = els.input.value.trim();
+  if (!text || state.isSending) return;
+
+  state.isSending = true;
+  els.sendBtn.disabled = true;
+  els.input.value = '';
+
+  try {
+    const ch = state.data.channels.find(c => c.id === state.currentChannel);
+    ch.messages.push({
+      id: 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      user: state.username,
+      text,
+      timestamp: Date.now()
+    });
+    // trim to last 500 messages per channel
+    if (ch.messages.length > 500) ch.messages = ch.messages.slice(-500);
+
+    await saveData(state.data);
+    state.lastRenderHash = ''; // force re-render
+    renderMessages();
+    setStatus(true);
+  } catch (e) {
+    console.error(e);
+    setStatus(false);
+    alert('Failed to send message. Check console.');
+  } finally {
+    state.isSending = false;
+    els.sendBtn.disabled = false;
+    els.input.focus();
+  }
+}
+
+async function createChannel() {
+  const name = prompt('New channel name (no spaces):');
+  if (!name) return;
+  const clean = name.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+  if (!clean) return;
+  if (state.data.channels.some(c => c.id === clean)) {
+    alert('Channel already exists.');
+    return;
+  }
+  state.data.channels.push({ id: clean, name: clean, messages: [] });
+  try {
+    await saveData(state.data);
+    switchChannel(clean);
+    renderChannels();
+  } catch (e) {
+    alert('Failed to create channel.');
+  }
+}
+
+async function deleteChannel(id) {
+  if (state.data.channels.length <= 1) {
+    alert('You must keep at least one channel.');
+    return;
+  }
+  if (!confirm(`Delete #${id} and all its messages?`)) return;
+  state.data.channels = state.data.channels.filter(c => c.id !== id);
+  if (state.currentChannel === id) {
+    state.currentChannel = state.data.channels[0].id;
+    state.lastRenderHash = '';
+  }
+  try {
+    await saveData(state.data);
+    renderAll();
+  } catch (e) {
+    alert('Failed to delete channel.');
+  }
+}
+
+function switchChannel(id) {
+  state.currentChannel = id;
+  state.lastRenderHash = '';
+  renderAll();
+  els.input.focus();
+}
+
+function changeUsername() {
+  const n = prompt('Your display name:', state.username);
+  if (!n) return;
+  const clean = n.trim().slice(0, 24) || 'You';
+  state.username = clean;
+  localStorage.setItem('md_username', clean);
+  els.userBadge.textContent = clean;
+}
+
+/* ============ POLLING ============ */
+let pollTimer = null;
+
+async function poll() {
+  try {
+    const fresh = await fetchData();
+    if (!fresh || !Array.isArray(fresh.channels)) throw new Error('Bad data');
+
+    // Detect new messages from others
+    const prev = state.data;
+    state.data = fresh;
+
+    if (!state.data.channels.find(c => c.id === state.currentChannel)) {
+      state.currentChannel = state.data.channels[0]?.id || null;
+    }
+
+    // Only re-render if something changed
+    const changed = JSON.stringify(prev) !== JSON.stringify(fresh);
+    if (changed) {
+      state.lastRenderHash = '';
+      renderAll();
+    }
+    setStatus(true);
+  } catch (e) {
+    console.error('Poll error:', e);
+    setStatus(false);
+  }
+}
+
+function startPolling() {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(poll, CONFIG.REFRESH_INTERVAL);
+}
+
+/* ============ INIT ============ */
+async function init() {
+  els.userBadge.textContent = state.username;
+  showLoading(true);
+  try {
+    state.data = await fetchData();
+    if (!state.data || !Array.isArray(state.data.channels) || state.data.channels.length === 0) {
+      state.data = { channels: [{ id: 'general', name: 'general', messages: [] }], lastUpdated: 0 };
+      await saveData(state.data);
+    }
+    state.currentChannel = state.data.channels[0].id;
+    renderAll();
+    setStatus(true);
+    startPolling();
+  } catch (e) {
+    console.error('Init error:', e);
+    setStatus(false);
+    alert('Failed to load data. Check your Bin ID and Master Key, and make sure CORS is allowed.');
+  } finally {
+    showLoading(false);
+    els.input.focus();
+  }
+}
+
+/* ============ EVENTS ============ */
+els.sendBtn.addEventListener('click', sendMessage);
+els.input.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+els.addChannel.addEventListener('click', createChannel);
+els.userBadge.addEventListener('click', changeUsername);
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
